@@ -509,6 +509,7 @@ const BibliotecaView = () => {
         robot_needed: null,
     });
     const [selectedCategory, setSelectedCategory] = useState('all');
+    const [searchTerm, setSearchTerm] = useState('');
 
     const filteredProjects = BIBLIOTECA_DATA.filter(p => {
         let matchesCategory = true;
@@ -529,13 +530,43 @@ const BibliotecaView = () => {
             }
         }
 
-        return matchesCategory && matchesEtapa && matchesArea && matchesRobot;
+        let matchesSearch = true;
+        if (searchTerm.trim()) {
+            const search = searchTerm.toLowerCase();
+            matchesSearch = p.title.toLowerCase().includes(search) ||
+                           p.category.toLowerCase().includes(search);
+        }
+
+        return matchesCategory && matchesEtapa && matchesArea && matchesRobot && matchesSearch;
     });
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Columna de Filtros */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-4">
+                {/* Buscador */}
+                <div className="p-4 bg-white rounded-xl shadow-lg">
+                    <div className="relative flex items-center bg-gray-100 rounded-lg py-2 px-4">
+                        <Search className="w-4 h-4 text-gray-500" />
+                        <input
+                            type="text"
+                            placeholder="Buscar proyectos..."
+                            className="ml-2 w-full bg-transparent focus:outline-none text-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        {searchTerm && (
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="ml-2 text-gray-400 hover:text-gray-600"
+                                aria-label="Limpiar búsqueda"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
                 <FilterPanel filters={activeFilter} setFilters={setActiveFilter} />
             </div>
 
