@@ -586,32 +586,179 @@ const BibliotecaView = () => {
     );
 };
 
-// Componente para la Vista de Dashboard
-const DashboardBlocksView = ({ setActiveTab }) => {
-    const blocks = [
-        { title: "Mis Clases", subtitle: "Crea o únete a clases para gestionar tus proyectos.", icon: Users, color: "bg-gradient-to-br from-purple-600 to-purple-700", target: "Mis clases" },
-        { title: "Biblioteca", subtitle: "Explora proyectos listos para usar y personalizables.", icon: BookOpen, color: "bg-gradient-to-br from-teal-600 to-teal-700", target: "Biblioteca" },
-        { title: "Recursos", subtitle: "Encuentra guías, tutoriales y herramientas de apoyo.", icon: Globe, color: "bg-gradient-to-br from-amber-600 to-amber-700", target: "Recursos" },
-        { title: "En tu Casa", subtitle: "Actividades y propuestas para hacer fuera del aula.", icon: Home, color: "bg-gradient-to-br from-pink-600 to-pink-700", target: "En tu casa" },
+// ✨ NUEVO: Quick Navigation Component (barra de navegación rápida)
+const QuickNav = ({ activeTab, setActiveTab }) => {
+    const sections = [
+        { key: 'Mis clases', icon: Users, color: 'text-purple-600' },
+        { key: 'Biblioteca', icon: BookOpen, color: 'text-teal-600' },
+        { key: 'Recursos', icon: Globe, color: 'text-amber-600' },
+        { key: 'En tu casa', icon: Home, color: 'text-pink-600' },
+    ];
+
+    if (activeTab === 'Dashboard') return null;
+
+    return (
+        <nav
+            className="sticky top-16 bg-white border-b border-gray-100 px-4 sm:px-8 py-3 z-10 shadow-sm overflow-x-auto"
+            aria-label="Navegación rápida entre secciones"
+        >
+            <div className="flex gap-2 sm:gap-4">
+                {sections.map(section => {
+                    const Icon = section.icon;
+                    const isActive = activeTab === section.key;
+                    return (
+                        <button
+                            key={section.key}
+                            onClick={() => setActiveTab(section.key)}
+                            className={`flex items-center gap-2 text-sm font-medium whitespace-nowrap pb-2 border-b-2 transition flex-shrink-0 ${
+                                isActive
+                                    ? `border-current ${section.color}`
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            }`}
+                            aria-current={isActive ? 'page' : undefined}
+                        >
+                            <Icon className="w-4 h-4" />
+                            <span className="hidden sm:inline">{section.key}</span>
+                        </button>
+                    );
+                })}
+            </div>
+        </nav>
+    );
+};
+
+// ✨ NUEVO: Mobile Bottom Navigation Component
+const MobileBottomNav = ({ activeTab, setActiveTab }) => {
+    const navItems = [
+        { key: 'Dashboard', icon: Home, label: 'Inicio' },
+        { key: 'Mis clases', icon: Users, label: 'Clases' },
+        { key: 'Biblioteca', icon: BookOpen, label: 'Proyectos' },
+        { key: 'Recursos', icon: Globe, label: 'Más' },
     ];
 
     return (
-        <div className="p-6">
-            <h2 className="text-3xl font-bold mb-8 text-gray-800 font-display">Bienvenido a GoSteam Evolution</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {blocks.map(block => (
-                    <div
-                        key={block.title}
-                        onClick={() => setActiveTab(block.target)}
-                        className={`p-6 rounded-xl shadow-xl transform hover:scale-105 transition duration-300 cursor-pointer text-white flex flex-col justify-between h-48 ${block.color}`}
-                    >
-                        <block.icon className="w-8 h-8 mb-4 opacity-80" />
-                        <div>
-                            <h3 className="text-xl font-bold mb-1 font-display">{block.title}</h3>
-                            <p className="text-sm opacity-90">{block.subtitle}</p>
+        <nav
+            className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 shadow-lg"
+            aria-label="Navegación principal móvil"
+        >
+            <div className="flex justify-around items-center">
+                {navItems.map(item => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.key;
+                    return (
+                        <button
+                            key={item.key}
+                            onClick={() => setActiveTab(item.key)}
+                            className={`flex flex-col items-center justify-center flex-1 py-2 px-1 transition-colors ${
+                                isActive
+                                    ? 'text-gosteam-purple'
+                                    : 'text-gray-500'
+                            }`}
+                            aria-label={item.label}
+                            aria-current={isActive ? 'page' : undefined}
+                        >
+                            <Icon className="w-6 h-6 mb-1" strokeWidth={isActive ? 2.5 : 2} />
+                            <span className={`text-xs ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                                {item.label}
+                            </span>
+                        </button>
+                    );
+                })}
+            </div>
+        </nav>
+    );
+};
+
+// ✨ MEJORADO: Dashboard con Activity Badges
+const DashboardBlocksView = ({ setActiveTab }) => {
+    const blocks = [
+        {
+            title: "Mis Clases",
+            subtitle: "Crea o únete a clases para gestionar tus proyectos.",
+            icon: Users,
+            color: "bg-gradient-to-br from-purple-600 to-purple-700",
+            target: "Mis clases",
+            badge: { count: 3, label: "activas" }
+        },
+        {
+            title: "Biblioteca",
+            subtitle: "Explora proyectos listos para usar y personalizables.",
+            icon: BookOpen,
+            color: "bg-gradient-to-br from-teal-600 to-teal-700",
+            target: "Biblioteca",
+            badge: { count: 76, label: "proyectos" }
+        },
+        {
+            title: "Recursos",
+            subtitle: "Encuentra guías, tutoriales y herramientas de apoyo.",
+            icon: Globe,
+            color: "bg-gradient-to-br from-amber-600 to-amber-700",
+            target: "Recursos"
+        },
+        {
+            title: "En tu Casa",
+            subtitle: "Actividades y propuestas para hacer fuera del aula.",
+            icon: Home,
+            color: "bg-gradient-to-br from-pink-600 to-pink-700",
+            target: "En tu casa"
+        },
+    ];
+
+    return (
+        <div className="p-4 sm:p-6">
+            <div className="mb-8">
+                <h2 className="text-3xl font-bold mb-2 text-gray-800 font-display">
+                    Bienvenido a GoSteam Evolution
+                </h2>
+                <p className="text-gray-600">
+                    Elige una sección para comenzar a trabajar con tus proyectos STEAM
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                {blocks.map(block => {
+                    const Icon = block.icon;
+                    return (
+                        <div
+                            key={block.title}
+                            onClick={() => setActiveTab(block.target)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    setActiveTab(block.target);
+                                }
+                            }}
+                            tabIndex={0}
+                            role="button"
+                            aria-label={`Navegar a ${block.title}`}
+                            className={`relative p-6 rounded-xl shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer text-white flex flex-col justify-between h-48 ${block.color} focus:outline-none focus:ring-4 focus:ring-gosteam-purple focus:ring-opacity-50`}
+                        >
+                            {block.badge && (
+                                <span className="absolute top-3 right-3 bg-white bg-opacity-90 text-gray-900 text-xs font-bold px-2 py-1 rounded-full shadow-md backdrop-blur-sm">
+                                    {block.badge.count} {block.badge.label}
+                                </span>
+                            )}
+
+                            <Icon className="w-8 h-8 mb-4 opacity-90" aria-hidden="true" />
+
+                            <div>
+                                <h3 className="text-xl font-bold mb-2 font-display">
+                                    {block.title}
+                                </h3>
+                                <p className="text-sm opacity-90 leading-relaxed">
+                                    {block.subtitle}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
+            </div>
+
+            {/* Keyboard shortcuts hint */}
+            <div className="mt-8 p-4 bg-gray-100 rounded-lg hidden md:block">
+                <p className="text-xs text-gray-600 text-center">
+                    <strong>Atajos de teclado:</strong> Alt+1 Mis Clases • Alt+2 Biblioteca • Alt+3 Recursos • Alt+4 En tu Casa • Alt+H Dashboard
+                </p>
             </div>
         </div>
     );
@@ -626,6 +773,42 @@ export const App = () => {
   // ✨ CAMBIO: Logo a color para el header
   const goSteamLogoUrl = "/gosteam_color-logo.87f8073e.svg";
   const goSteamWhiteLogoUrl = "/gosteam_white-logo.svg";
+
+  // ✨ NUEVO: Keyboard Shortcuts
+  React.useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.altKey && !e.ctrlKey && !e.metaKey) {
+        switch(e.key) {
+          case '1':
+            setActiveTab('Mis clases');
+            e.preventDefault();
+            break;
+          case '2':
+            setActiveTab('Biblioteca');
+            e.preventDefault();
+            break;
+          case '3':
+            setActiveTab('Recursos');
+            e.preventDefault();
+            break;
+          case '4':
+            setActiveTab('En tu casa');
+            e.preventDefault();
+            break;
+          case 'h':
+          case 'H':
+            setActiveTab('Dashboard');
+            e.preventDefault();
+            break;
+          default:
+            return;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -711,11 +894,17 @@ export const App = () => {
                 </div>
             </header>
 
+            {/* Quick Navigation Bar */}
+            <QuickNav activeTab={activeTab} setActiveTab={setActiveTab} />
+
             {/* Contenido Principal */}
-            <main className="container mx-auto p-4 sm:p-8 max-w-7xl flex-grow">
+            <main className="container mx-auto p-4 sm:p-8 max-w-7xl flex-grow mb-16 md:mb-0">
                 <p className="text-gray-500 text-sm mb-6">Año Escolar: 2025/2026</p>
                 {renderContent()}
             </main>
+
+            {/* Mobile Bottom Navigation */}
+            <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
             {/* ✨ MEJORA: Footer con fondo negro y logo blanco */}
             <footer className="bg-black text-white relative overflow-hidden">
