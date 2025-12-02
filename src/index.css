@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Aplicar fuentes globales */
+body {
+  font-family: 'Titillium Web', system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Space Grotesk', 'Titillium Web', sans-serif;
+}
+
+/* Mejoras de scrollbar para el asistente */
+.assistant-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.assistant-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.assistant-scrollbar::-webkit-scrollbar-thumb {
+  background: #C83E7F;
+  border-radius: 10px;
+}
+
+.assistant-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #A0325F;
+}
+
+/* Animación sutil para las cards */
+@keyframes cardHover {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.skeleton {
+  animation: shimmer 1.2s ease-in-out infinite;
+  background: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 20%, #f0f0f0 40%, #f0f0f0 100%);
+  background-size: 800px 104px;
+}
