@@ -797,7 +797,6 @@ const DashboardBlocksView = ({ setActiveTab }) => {
 
 // --- Main App Component ---
 export const App = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
@@ -903,27 +902,10 @@ export const App = () => {
                 </div>
 
                 {/* Acciones & Usuario */}
-                <div className="flex items-center space-x-3 sm:space-x-4">
-
-                    {/* Search Box - solo visible en Biblioteca */}
-                    {activeTab === 'Biblioteca' && (
-                        <div className="relative hidden md:flex items-center bg-gray-100 rounded-full py-2 px-4 w-56">
-                            <Search className="w-4 h-4 text-gray-500" />
-                            <input
-                                type="text"
-                                placeholder="Buscar proyectos..."
-                                className="ml-2 w-full bg-transparent focus:outline-none text-sm"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    )}
-
-                    <div className="flex items-center space-x-4 ml-4">
-                        <Bell className="w-5 h-5 text-gray-500 cursor-pointer hover:text-gosteam-purple" />
-                        <UserCircle className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gosteam-purple" />
-                        <img src="https://flagcdn.com/w20/es.png" alt="Español" className="w-5 h-4 rounded-sm border border-gray-300" />
-                    </div>
+                <div className="flex items-center space-x-4">
+                    <Bell className="w-5 h-5 text-gray-500 cursor-pointer hover:text-gosteam-purple" />
+                    <UserCircle className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gosteam-purple" />
+                    <img src="https://flagcdn.com/w20/es.png" alt="Español" className="w-5 h-4 rounded-sm border border-gray-300" />
                 </div>
             </header>
 
