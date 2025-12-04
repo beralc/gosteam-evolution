@@ -302,9 +302,24 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
 
     const handleBotLinkClick = (e, href) => {
         e.preventDefault();
-        if (href.includes('#/biblioteca') || href.includes('biblioteca')) {
-            setIsOpen(false);
-            setActiveTab('Biblioteca');
+
+        // Map of link hrefs to tab names
+        const linkToTab = {
+            'biblioteca': 'Biblioteca',
+            'mis-clases': 'Mis clases',
+            'dashboard': 'Dashboard',
+            'recursos': 'Recursos',
+            'en-tu-casa': 'En tu casa'
+        };
+
+        // Find matching tab
+        const lowerHref = href.toLowerCase();
+        for (const [key, tabName] of Object.entries(linkToTab)) {
+            if (lowerHref.includes(key)) {
+                setIsOpen(false); // Close assistant
+                setActiveTab(tabName); // Navigate to section
+                return;
+            }
         }
     };
 
