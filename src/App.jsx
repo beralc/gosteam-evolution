@@ -862,7 +862,7 @@ const DashboardBlocksView = ({ setActiveTab }) => {
             title: "Mis Clases",
             subtitle: "Crea o únete a clases para gestionar tus proyectos.",
             icon: Users,
-            color: "bg-gradient-to-br from-purple-600 to-purple-700",
+            color: "bg-gradient-to-br from-[#C83E7F] to-[#A0325F]",
             target: "Mis clases",
             badge: { count: 3, label: "activas" }
         },
@@ -870,7 +870,7 @@ const DashboardBlocksView = ({ setActiveTab }) => {
             title: "Biblioteca",
             subtitle: "Explora proyectos listos para usar y personalizables.",
             icon: BookOpen,
-            color: "bg-gradient-to-br from-teal-600 to-teal-700",
+            color: "bg-gradient-to-br from-[#49A0DE] to-[#3680B8]",
             target: "Biblioteca",
             badge: { count: 76, label: "proyectos" }
         },
@@ -878,14 +878,14 @@ const DashboardBlocksView = ({ setActiveTab }) => {
             title: "Recursos",
             subtitle: "Encuentra guías, tutoriales y herramientas de apoyo.",
             icon: Globe,
-            color: "bg-gradient-to-br from-amber-600 to-amber-700",
+            color: "bg-gradient-to-br from-[#FBEB4E] to-[#E8D63E]",
             target: "Recursos"
         },
         {
             title: "En tu Casa",
             subtitle: "Actividades y propuestas para hacer fuera del aula.",
             icon: Home,
-            color: "bg-gradient-to-br from-pink-600 to-pink-700",
+            color: "bg-gradient-to-br from-[#8DB442] to-[#729635]",
             target: "En tu casa"
         },
     ];
@@ -940,12 +940,6 @@ const DashboardBlocksView = ({ setActiveTab }) => {
                 })}
             </div>
 
-            {/* Keyboard shortcuts hint */}
-            <div className="mt-8 p-4 bg-gray-100 rounded-lg hidden md:block">
-                <p className="text-xs text-gray-600 text-center">
-                    <strong>Atajos de teclado:</strong> Alt+1 Mis Clases • Alt+2 Biblioteca • Alt+3 Recursos • Alt+4 En tu Casa • Alt+H Dashboard
-                </p>
-            </div>
         </div>
     );
 };
@@ -959,41 +953,6 @@ export const App = () => {
   const goSteamLogoUrl = "/gosteam_color-logo.87f8073e.svg";
   const goSteamWhiteLogoUrl = "/gosteam_white-logo.svg";
 
-  // ✨ NUEVO: Keyboard Shortcuts
-  React.useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.altKey && !e.ctrlKey && !e.metaKey) {
-        switch(e.key) {
-          case '1':
-            setActiveTab('Mis clases');
-            e.preventDefault();
-            break;
-          case '2':
-            setActiveTab('Biblioteca');
-            e.preventDefault();
-            break;
-          case '3':
-            setActiveTab('Recursos');
-            e.preventDefault();
-            break;
-          case '4':
-            setActiveTab('En tu casa');
-            e.preventDefault();
-            break;
-          case 'h':
-          case 'H':
-            setActiveTab('Dashboard');
-            e.preventDefault();
-            break;
-          default:
-            return;
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
