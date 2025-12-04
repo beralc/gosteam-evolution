@@ -209,8 +209,23 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
     const [configError, setConfigError] = useState('');
     const chatEndRef = React.useRef(null);
 
-    // Check for API key in localStorage on mount
+    // Check for API key in environment variables or localStorage on mount
     useEffect(() => {
+        // First, check for environment variable
+        const envKey = import.meta.env.VITE_OPENAI_API_KEY;
+        if (envKey) {
+            try {
+                initializeOpenAI(envKey);
+                setApiKey(envKey);
+                setIsConfigured(true);
+                // Don't store env key in localStorage
+                return;
+            } catch (error) {
+                console.error('Error initializing OpenAI from env:', error);
+            }
+        }
+
+        // If no env key, check localStorage
         const storedKey = localStorage.getItem('gosteam_openai_key');
         if (storedKey) {
             try {
@@ -218,7 +233,7 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
                 setApiKey(storedKey);
                 setIsConfigured(true);
             } catch (error) {
-                console.error('Error initializing OpenAI:', error);
+                console.error('Error initializing OpenAI from storage:', error);
             }
         }
     }, []);
