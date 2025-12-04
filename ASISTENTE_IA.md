@@ -81,15 +81,18 @@ Preguntas sobre STEAM, metodología educativa, sugerencias:
 
 ### ✅ Preguntas Recomendadas
 
-**Sobre funcionalidad:**
+**Sobre funcionalidad (incluye enlaces clicables):**
 - "¿Cómo busco proyectos en la Biblioteca?"
+  - ✨ El asistente incluirá un enlace directo a la Biblioteca
 - "¿Qué significan los filtros de etapa y área?"
 - "¿Cómo creo una nueva clase?"
+  - ✨ Incluirá enlace a Mis Clases
 - "¿Qué atajos de teclado puedo usar?"
 - "¿Cómo funciona la navegación en móvil?"
 
 **Sobre proyectos (general):**
 - "¿Qué proyectos hay para 5º de Primaria?"
+  - ✨ Sugerirá explorar la Biblioteca con enlace directo
 - "Necesito proyectos de robótica sin hardware"
 - "¿Cuántos proyectos hay de IA?"
 - "Quiero proyectos cortos de 3-4 sesiones"
@@ -97,6 +100,7 @@ Preguntas sobre STEAM, metodología educativa, sugerencias:
 **Sobre contenido (guía socrática):**
 - "¿Qué es el proyecto de Arduino?"
 - "¿Qué aprenden los niños en el proyecto de Stop Motion?"
+  - ✨ Te guiará a descubrirlo por ti mismo con enlaces a la Biblioteca
 
 ## 🔒 Seguridad y Privacidad
 
@@ -134,16 +138,32 @@ El asistente tiene acceso a:
 ### Detección Inteligente de Preguntas
 El asistente analiza tu pregunta automáticamente para determinar:
 1. ¿Es sobre contenido de un proyecto? → Modo Socrático
-2. ¿Es sobre funcionalidad de la plataforma? → Respuesta directa
-3. ¿Es general? → Orientación y sugerencias
+2. ¿Es sobre funcionalidad de la plataforma? → Respuesta directa con enlaces
+3. ¿Es general? → Orientación y sugerencias con enlaces
+4. ¿Es fuera de contexto? → Rechazo educado (seguridad para primaria)
 
 ### Características de la Interfaz
 - ✅ Auto-scroll a mensajes nuevos
 - ✅ Indicador de "Pensando..." mientras procesa
 - ✅ Manejo de errores con mensajes claros
+- ✅ **Enlaces clicables de navegación interna** ✨ NUEVO
+- ✅ Cierre automático del asistente al navegar
 - ✅ Soporte para links markdown en respuestas
 - ✅ Historial de conversación (últimos 10 mensajes)
 - ✅ Responsive (funciona en móvil y desktop)
+
+### 🔗 Enlaces de Navegación Inteligentes ✨ NUEVO
+El asistente incluye enlaces clicables que navegan a secciones de la plataforma:
+- **[Ver Biblioteca](biblioteca)** → Abre la Biblioteca de proyectos
+- **[Ir a Mis Clases](mis-clases)** → Abre la gestión de clases
+- **[Volver al Dashboard](dashboard)** → Regresa a la página principal
+- **[Ver Recursos](recursos)** → Abre la sección de recursos
+- **[Ver En tu Casa](en-tu-casa)** → Abre actividades para el hogar
+
+Al hacer clic en un enlace:
+1. El asistente se cierra automáticamente
+2. Navega a la sección correspondiente
+3. Mejora la experiencia de usuario (menos clics)
 
 ## ❓ Solución de Problemas
 
