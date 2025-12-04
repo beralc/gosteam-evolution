@@ -862,7 +862,7 @@ const DashboardBlocksView = ({ setActiveTab }) => {
             title: "Mis Clases",
             subtitle: "Crea o únete a clases para gestionar tus proyectos.",
             icon: Users,
-            color: "bg-gradient-to-br from-[#C83E7F] to-[#A0325F]",
+            color: "bg-gradient-to-br from-purple-600 to-purple-700",
             target: "Mis clases",
             badge: { count: 3, label: "activas" }
         },
@@ -870,7 +870,7 @@ const DashboardBlocksView = ({ setActiveTab }) => {
             title: "Biblioteca",
             subtitle: "Explora proyectos listos para usar y personalizables.",
             icon: BookOpen,
-            color: "bg-gradient-to-br from-[#49A0DE] to-[#3680B8]",
+            color: "bg-gradient-to-br from-teal-600 to-teal-700",
             target: "Biblioteca",
             badge: { count: 76, label: "proyectos" }
         },
@@ -878,14 +878,14 @@ const DashboardBlocksView = ({ setActiveTab }) => {
             title: "Recursos",
             subtitle: "Encuentra guías, tutoriales y herramientas de apoyo.",
             icon: Globe,
-            color: "bg-gradient-to-br from-[#FBEB4E] to-[#E8D63E]",
+            color: "bg-gradient-to-br from-amber-600 to-amber-700",
             target: "Recursos"
         },
         {
             title: "En tu Casa",
             subtitle: "Actividades y propuestas para hacer fuera del aula.",
             icon: Home,
-            color: "bg-gradient-to-br from-[#8DB442] to-[#729635]",
+            color: "bg-gradient-to-br from-pink-600 to-pink-700",
             target: "En tu casa"
         },
     ];
