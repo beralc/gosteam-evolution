@@ -45,10 +45,77 @@ export const isOpenAIInitialized = () => {
 };
 
 /**
+ * Check if question is related to GoSteam platform or STEAM education
+ * Returns true if related, false if off-topic
+ */
+const isRelatedToGoSteam = (userMessage) => {
+  const lowerMessage = userMessage.toLowerCase();
+
+  // Platform-related keywords
+  const platformKeywords = [
+    'gosteam', 'biblioteca', 'proyecto', 'filtro', 'buscar', 'navega',
+    'clase', 'recurso', 'dashboard', 'sesion', 'docente', 'profesor'
+  ];
+
+  // STEAM-related keywords
+  const steamKeywords = [
+    'robot', 'programación', 'código', 'scratch', 'arduino', 'lego',
+    'creatividad', 'diseño', 'arte', 'música', 'inteligencia artificial',
+    'ia', 'ciencia', 'científico', 'matemáticas', 'tecnología',
+    'steam', 'maker', 'impresión 3d', 'electrónica'
+  ];
+
+  // Educational stages
+  const educationalKeywords = [
+    'infantil', 'primaria', 'secundaria', 'bachillerato',
+    'etapa', 'área', 'asignatura'
+  ];
+
+  // Check if message contains any related keywords
+  const hasRelatedKeyword = [...platformKeywords, ...steamKeywords, ...educationalKeywords]
+    .some(keyword => lowerMessage.includes(keyword));
+
+  // Check if mentions any project
+  const mentionsProject = ALL_PROJECTS.some(project =>
+    lowerMessage.includes(project.title.toLowerCase())
+  );
+
+  // Off-topic indicators (questions clearly not about the platform)
+  const offTopicKeywords = [
+    'quién es', 'dónde está', 'cuándo', 'por qué',
+    'capital de', 'presidente', 'historia de',
+    'cuánto es', 'cuántos años', 'fecha de nacimiento',
+    'película', 'canción', 'jugador', 'equipo de fútbol',
+    'receta', 'clima', 'tiempo', 'hora'
+  ];
+
+  const hasOffTopicKeyword = offTopicKeywords.some(keyword =>
+    lowerMessage.includes(keyword)
+  );
+
+  // Very short questions without context are likely off-topic
+  if (lowerMessage.length < 15 && !hasRelatedKeyword && !mentionsProject) {
+    return false;
+  }
+
+  // If it has off-topic keywords and no platform keywords, it's off-topic
+  if (hasOffTopicKeyword && !hasRelatedKeyword && !mentionsProject) {
+    return false;
+  }
+
+  return hasRelatedKeyword || mentionsProject;
+};
+
+/**
  * Detect the type of question being asked
- * Returns: 'project_content' | 'functionality' | 'general'
+ * Returns: 'project_content' | 'functionality' | 'general' | 'off_topic'
  */
 const detectQuestionType = (userMessage) => {
+  // First, check if question is related to GoSteam at all
+  if (!isRelatedToGoSteam(userMessage)) {
+    return 'off_topic';
+  }
+
   const lowerMessage = userMessage.toLowerCase();
 
   // Keywords that indicate questions about project content
@@ -157,7 +224,14 @@ ${FAQ.categories.slice(0, 1)[0].questions.map(q =>
 const createSystemPrompt = (questionType) => {
   const basePrompt = `Eres el Asistente GoSteam, un asistente educativo amigable y profesional de la plataforma GoSteam Evolution de Edelvives.
 
-Tu objetivo es ayudar a profesores españoles a usar la plataforma y gestionar proyectos STEAM.
+Tu objetivo es ayudar a profesores y alumnos de primaria a usar la plataforma y gestionar proyectos STEAM.
+
+⚠️ RESTRICCIÓN IMPORTANTE - SOLO TEMAS DE LA PLATAFORMA:
+- SOLO puedes responder preguntas sobre la plataforma GoSteam, sus proyectos STEAM, y cómo usarla
+- Si te preguntan algo que NO está relacionado con GoSteam o educación STEAM, debes decir amablemente:
+  "Lo siento, solo puedo ayudarte con preguntas sobre la plataforma GoSteam y sus proyectos STEAM. ¿Hay algo sobre los proyectos o la plataforma en lo que pueda ayudarte?"
+- NO respondas preguntas sobre: temas generales, actualidad, matemáticas generales, tareas escolares no relacionadas, etc.
+- MANTÉN un tono apropiado para alumnos de primaria (6-12 años): amigable, claro, motivador
 
 CONTEXTO DE LA PLATAFORMA:
 ${buildContextString()}
@@ -220,17 +294,23 @@ Tipo de pregunta: GENERAL
 
 La pregunta es general sobre la plataforma o el aprendizaje STEAM.
 
-**Proporciona información ÚTIL y ORIENTADORA.**
+**PRIMERO verifica que la pregunta esté relacionada con GoSteam:**
+- ¿Es sobre proyectos STEAM de la plataforma?
+- ¿Es sobre cómo usar GoSteam?
+- ¿Es sobre educación STEAM en general?
 
-Puedes:
-1. **Explicar conceptos** generales sobre STEAM
-2. **Sugerir proyectos** relevantes según las necesidades del usuario
+**Si NO está relacionado con GoSteam o STEAM:**
+Responde amablemente: "Lo siento, solo puedo ayudarte con preguntas sobre la plataforma GoSteam y sus proyectos STEAM. ¿Hay algo sobre los proyectos o cómo usar la plataforma en lo que pueda ayudarte?"
+
+**Si SÍ está relacionado, proporciona información ÚTIL:**
+1. **Explicar conceptos** STEAM relacionados con los proyectos de la plataforma
+2. **Sugerir proyectos** específicos de la biblioteca
 3. **Ofrecer recursos** disponibles en la plataforma
-4. **Dar contexto educativo** sobre metodologías y enfoques
+4. **Dar contexto educativo** sobre los proyectos
 
-Mantén un tono **amigable, profesional y educativo**.
+Mantén un tono **amigable, claro y apropiado para primaria** (6-12 años).
 
-Si no estás seguro de algo, sé honesto y sugiere alternativas o dónde buscar más información.
+Si no estás seguro de algo sobre la plataforma, sé honesto y sugiere explorar la Biblioteca o consultar con el profesor.
 `;
   }
 };
@@ -246,6 +326,16 @@ export const chatWithAssistant = async (userMessage, conversationHistory = []) =
   try {
     // Detect question type
     const questionType = detectQuestionType(userMessage);
+
+    // If question is off-topic, return immediately without calling API
+    if (questionType === 'off_topic') {
+      return {
+        success: true,
+        message: '🎨 Lo siento, solo puedo ayudarte con preguntas sobre la plataforma GoSteam y sus proyectos STEAM (ciencia, tecnología, ingeniería, arte y matemáticas).\n\n¿Hay algo sobre los proyectos de la Biblioteca o cómo usar la plataforma en lo que pueda ayudarte? 😊',
+        questionType: questionType,
+        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
+      };
+    }
 
     // Build messages array
     const messages = [
