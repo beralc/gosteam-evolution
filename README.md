@@ -57,10 +57,9 @@ horizonte_talento/
 - ✅ Ver documentación completa en `ASISTENTE_IA.md`
 
 ### Navegación Híbrida
-- ✅ **Dashboard con bloques visuales** para acceso rápido
+- ✅ **Dashboard con bloques visuales** en colores GoSteam para acceso rápido
 - ✅ **QuickNav** - Barra de navegación horizontal en secciones
 - ✅ **MobileBottomNav** - Navegación inferior para móviles
-- ✅ **Atajos de teclado:** Alt+1 (Clases), Alt+2 (Biblioteca), Alt+3 (Recursos), Alt+4 (En tu Casa), Alt+H (Dashboard)
 - ✅ Activity badges mostrando "3 activas" y "76 proyectos"
 - ✅ Accesibilidad mejorada con tabIndex y aria-labels
 

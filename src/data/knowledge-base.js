@@ -90,30 +90,25 @@ export const PROJECT_CATEGORIES = [
 export const NAVIGATION_SECTIONS = [
   {
     name: "Dashboard",
-    description: "Página principal con acceso rápido a todas las secciones",
-    keyboard_shortcut: "Alt+H"
+    description: "Página principal con acceso rápido a todas las secciones con bloques de colores GoSteam"
   },
   {
     name: "Mis clases",
     description: "Gestiona tus clases activas, crea nuevas clases o únete a clases existentes",
-    keyboard_shortcut: "Alt+1",
     features: ["Crear clase", "Unirse a clase", "Ver clases activas", "Gestionar borradores"]
   },
   {
     name: "Biblioteca",
     description: "Explora más de 76 proyectos STEAM listos para usar",
-    keyboard_shortcut: "Alt+2",
     features: ["Buscar proyectos", "Filtrar por etapa", "Filtrar por área", "Filtrar por robot necesario", "Ver por categorías"]
   },
   {
     name: "Recursos",
-    description: "Encuentra guías, tutoriales y herramientas de apoyo",
-    keyboard_shortcut: "Alt+3"
+    description: "Encuentra guías, tutoriales y herramientas de apoyo"
   },
   {
     name: "En tu casa",
-    description: "Actividades y propuestas para hacer fuera del aula",
-    keyboard_shortcut: "Alt+4"
+    description: "Actividades y propuestas para hacer fuera del aula"
   }
 ];
 
@@ -874,14 +869,15 @@ export const HOW_TO_GUIDES = {
       "Una vez unido, verás la clase en tu lista de clases activas"
     ]
   },
-  keyboard_shortcuts: {
-    title: "Atajos de teclado disponibles",
-    shortcuts: [
-      { key: "Alt + 1", action: "Ir a Mis Clases" },
-      { key: "Alt + 2", action: "Ir a Biblioteca" },
-      { key: "Alt + 3", action: "Ir a Recursos" },
-      { key: "Alt + 4", action: "Ir a En tu Casa" },
-      { key: "Alt + H", action: "Volver al Dashboard" }
+  dashboard_navigation: {
+    title: "Navegación desde el Dashboard",
+    steps: [
+      "El Dashboard muestra 4 bloques de colores GoSteam",
+      "Mis Clases (Rosa/Magenta): Gestiona tus clases activas",
+      "Biblioteca (Azul): Explora los 76 proyectos STEAM",
+      "Recursos (Amarillo): Encuentra guías y tutoriales",
+      "En tu Casa (Verde): Actividades para el hogar",
+      "Haz clic en cualquier bloque para acceder a esa sección"
     ]
   },
   mobile_navigation: {
