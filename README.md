@@ -43,21 +43,43 @@ horizonte_talento/
 
 ## ✨ Mejoras Implementadas
 
+### 🤖 Asistente IA con OpenAI (NUEVO)
+- ✅ **Integración completa con OpenAI GPT-4O Mini**
+- ✅ **Comportamiento adaptativo inteligente:**
+  - Preguntas sobre contenido de proyectos → Método socrático (guía al estudiante)
+  - Preguntas sobre funcionalidad → Respuestas directas
+  - Preguntas generales → Información orientadora
+- ✅ Base de conocimiento con 76 proyectos
+- ✅ Configuración de API key por interfaz
+- ✅ Almacenamiento seguro en localStorage
+- ✅ Detección automática del tipo de pregunta
+- ✅ Manejo robusto de errores
+- ✅ Ver documentación completa en `ASISTENTE_IA.md`
+
+### Navegación Híbrida
+- ✅ **Dashboard con bloques visuales** para acceso rápido
+- ✅ **QuickNav** - Barra de navegación horizontal en secciones
+- ✅ **MobileBottomNav** - Navegación inferior para móviles
+- ✅ **Atajos de teclado:** Alt+1 (Clases), Alt+2 (Biblioteca), Alt+3 (Recursos), Alt+4 (En tu Casa), Alt+H (Dashboard)
+- ✅ Activity badges mostrando "3 activas" y "76 proyectos"
+- ✅ Accesibilidad mejorada con tabIndex y aria-labels
+
 ### Diseño Gráfico
 - ✅ Tipografía: **Space Grotesk** (títulos) + **Titillium Web** (cuerpo)
-- ✅ Color de Creatividad cambiado de amarillo a ámbar (#F59E0B)
+- ✅ Paleta de colores oficial GoSteam (Rosa #C83E7F, Amarillo #FBEB4E, Verde #8DB442, Azul #49A0DE)
 - ✅ Iconos actualizados: `Sparkles` para STEAM, `Palette` para Creatividad
 - ✅ Cards con sombras multicapa y borde púrpura en hover
 - ✅ Footer con fondo negro y franja de acento multicolor
 - ✅ Logo a color en header, logo blanco en footer
 
 ### UX/UI
-- ✅ Filtrado instantáneo en Biblioteca
+- ✅ Filtrado instantáneo en Biblioteca con búsqueda por texto
 - ✅ Navegación mejorada con botón Home
-- ✅ Asistente chatbot con scroll personalizado
+- ✅ Asistente chatbot con scroll personalizado y auto-scroll
 - ✅ Cards con transición de elevación
 - ✅ Categorías con gradientes en Dashboard
 - ✅ Mejor jerarquía visual de información
+- ✅ Estados de carga con indicadores animados
 
 ## 🎨 Paleta de Colores (Identidad GoSteam)
 
@@ -77,35 +99,59 @@ horizonte_talento/
 ## 📊 Datos de Prueba
 
 El mockup incluye:
-- 6 proyectos iniciales
-- 50 proyectos adicionales (10 por categoría)
-- Filtros funcionales por:
+- **76 proyectos completos** con descripciones detalladas
+- **5 categorías STEAM:** Programación y robótica, Creatividad, IA, Ciudadanía digital, Cultura científica
+- **4 etapas educativas:** Educación Infantil, Primaria, Secundaria, Bachillerato
+- **Filtros funcionales por:**
   - Etapa educativa
-  - Área temática
-  - Necesidad de robot
+  - Área temática (Matemáticas, Lenguaje, Ciencias, Tecnología, Artes)
+  - Necesidad de robot (Con Robot / Sin Robot)
+- **Sistema de búsqueda por texto** en tiempo real
 
 ## 🔧 Comandos Disponibles
 
-- `npm run dev` - Inicia servidor de desarrollo
+- `npm run dev` - Inicia servidor de desarrollo (puerto 3000)
 - `npm run build` - Construye para producción
 - `npm run preview` - Previsualiza build de producción
+
+## 🤖 Configuración del Asistente IA
+
+### Opción 1: Configurar por interfaz (Recomendado)
+1. Abre la aplicación
+2. Haz clic en el botón flotante ✨ (esquina inferior derecha)
+3. Haz clic en el icono ⚙️ de configuración
+4. Pega tu API key de OpenAI
+5. Haz clic en "Guardar"
+
+### Opción 2: Variables de entorno (Opcional)
+1. Copia `.env.example` a `.env`
+2. Añade tu API key: `VITE_OPENAI_API_KEY=sk-...`
+3. Reinicia el servidor de desarrollo
+
+**Obtener API key:** https://platform.openai.com/api-keys
+
+**Ver documentación completa:** `ASISTENTE_IA.md`
 
 ## 📝 Próximas Mejoras Recomendadas
 
 Ver documentos:
-- `UX-UI-REVIEW-GOSTEAM.md` - Revisión completa de UX/UI
-- Análisis de diseño gráfico profesional (output del agente)
+- `UX-UI-REVIEW-GOSTEAM.md` - Revisión completa de UX/UI (10,000+ palabras)
+- `ASISTENTE_IA.md` - Documentación completa del asistente IA
+- `CONTEXT.md` - Contexto técnico del proyecto
 
 ### Prioridad Alta
-1. Implementar bottom sheet en móvil para el asistente
-2. Añadir navegación por teclado y ARIA labels
-3. Skeleton loading screens
-4. Toast notifications
+1. ✅ ~~Asistente IA funcional con OpenAI~~ (COMPLETADO)
+2. ✅ ~~Navegación híbrida (Dashboard + QuickNav + Mobile)~~ (COMPLETADO)
+3. Backend proxy para proteger API keys
+4. Skeleton loading screens
+5. Toast notifications
 
 ### Prioridad Media
-5. Micro-interacciones mejoradas
-6. Estados vacíos ilustrados
-7. Animaciones sutiles
+6. Búsqueda semántica de proyectos con embeddings
+7. Micro-interacciones mejoradas
+8. Estados vacíos ilustrados
+9. Animaciones sutiles
+10. Modo voz para el asistente (speech-to-text)
 
 ## 🤝 Créditos
 

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Search, Filter, Plus, Bell, UserCircle, BookOpen, Clock, Users, MoreVertical, Image, Menu, Sparkles, Palette, Cpu, Shield, Globe, Home, Mic, Upload, X, Send } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Plus, Bell, UserCircle, BookOpen, Clock, Users, MoreVertical, Image, Menu, Sparkles, Palette, Cpu, Shield, Globe, Home, X, Send, AlertCircle, CheckCircle, Settings } from 'lucide-react';
+import { initializeOpenAI, chatWithAssistant } from './utils/openai.js';
 
 // --- Mock Data y Nuevas Estructuras ---
 
@@ -191,68 +192,102 @@ const filterOptions = {
     robot_needed: ["Con Robot", "Sin Robot"],
 };
 
-// Conversaciones del asistente
-const ASSISTANT_RESPONSES = {
-    WELCOME: {
-        text: '¡Hola! Soy tu Asistente GoSteam. Puedo ayudarte a encontrar recursos, planificar clases o responder dudas sobre cualquier proyecto. ¿Qué necesitas hoy?',
-        quickReplies: [
-            { label: "Buscar proyectos en la Biblioteca", payload: "BUSCAR_PROYECTOS" },
-            { label: "Ayúdame a planificar mi próxima clase", payload: "PLANIFICAR_CLASE" },
-            { label: "Tengo una duda sobre un filtro", payload: "DUDA_FILTRO" },
-        ]
-    },
-    BUSCAR_PROYECTOS: {
-        text: '¡Excelente! Tenemos más de 50 proyectos listos para ti. Dime qué buscas o ve directamente a la biblioteca con los filtros ya aplicados:\n\n**Proyecto Sugerido:** "Programación de Videojuegos con Scratch" (4º Primaria)\n\nPuedes ver todos los proyectos disponibles aquí: [Ver Biblioteca](#/biblioteca)'
-    },
-    PLANIFICAR_CLASE: {
-        text: 'Para ayudarte a planificar, necesito saber:\n1. **Etapa educativa** (Ej: Secundaria)\n2. **Área temática** (Ej: STEAM, Creatividad)\n3. **Duración** (Ej: 3 sesiones)\n\nUna vez que me des esos detalles, te sugeriré una ruta de aprendizaje.'
-    },
-    DUDA_FILTRO: {
-        text: 'Los filtros te permiten acotar tu búsqueda. Por ejemplo, si seleccionas "Con Robot" solo verás proyectos que requieren hardware de robótica.\n\n¿Tienes una duda específica sobre el filtro de "Etapa" o "Área"?'
-    }
-};
+// Note: ASSISTANT_RESPONSES removed - now using OpenAI integration
 
 // --- Sub-Components ---
 
-// Componente para el Panel Lateral del Asistente
+// Componente para el Panel Lateral del Asistente con OpenAI
 const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
     const [query, setQuery] = useState('');
     const [conversationHistory, setConversationHistory] = useState([
-        { type: 'bot', text: ASSISTANT_RESPONSES.WELCOME.text, replies: ASSISTANT_RESPONSES.WELCOME.quickReplies }
+        { type: 'bot', text: '¡Hola! Soy tu Asistente GoSteam. Puedo ayudarte a encontrar recursos, planificar clases o responder dudas sobre la plataforma. ¿Qué necesitas hoy?' }
     ]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [apiKey, setApiKey] = useState('');
+    const [isConfigured, setIsConfigured] = useState(false);
+    const [showConfig, setShowConfig] = useState(false);
+    const [configError, setConfigError] = useState('');
+    const chatEndRef = React.useRef(null);
 
-    const handleSend = (userText, isQuickReply = false) => {
-        const payload = userText;
-        setConversationHistory(prev => [...prev, { type: 'user', text: isQuickReply ? userText : query }]);
+    // Check for API key in localStorage on mount
+    useEffect(() => {
+        const storedKey = localStorage.getItem('gosteam_openai_key');
+        if (storedKey) {
+            try {
+                initializeOpenAI(storedKey);
+                setApiKey(storedKey);
+                setIsConfigured(true);
+            } catch (error) {
+                console.error('Error initializing OpenAI:', error);
+            }
+        }
+    }, []);
 
-        let botResponse = {};
-        switch (payload) {
-            case 'BUSCAR_PROYECTOS':
-                botResponse = ASSISTANT_RESPONSES.BUSCAR_PROYECTOS;
-                break;
-            case 'PLANIFICAR_CLASE':
-                botResponse = ASSISTANT_RESPONSES.PLANIFICAR_CLASE;
-                break;
-            case 'DUDA_FILTRO':
-                botResponse = ASSISTANT_RESPONSES.DUDA_FILTRO;
-                break;
-            default:
-                botResponse = { text: "Gracias por tu consulta. Dame un momento para buscar la mejor respuesta en los recursos de GoSteam..." };
-                break;
+    // Auto-scroll to bottom when new messages arrive
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [conversationHistory]);
+
+    const handleConfigureAPI = () => {
+        if (!apiKey.trim()) {
+            setConfigError('Por favor, introduce una clave de API válida.');
+            return;
         }
 
-        setTimeout(() => {
-            setConversationHistory(prev => [...prev, { type: 'bot', text: botResponse.text, replies: botResponse.quickReplies }]);
-        }, 500);
+        try {
+            initializeOpenAI(apiKey.trim());
+            localStorage.setItem('gosteam_openai_key', apiKey.trim());
+            setIsConfigured(true);
+            setShowConfig(false);
+            setConfigError('');
+            setConversationHistory([
+                { type: 'bot', text: '¡Perfecto! La clave de API se ha configurado correctamente. Ahora puedo ayudarte con tus preguntas. ¿Qué necesitas saber?' }
+            ]);
+        } catch (error) {
+            setConfigError('Error al configurar la API. Verifica que la clave sea correcta.');
+        }
+    };
 
-        if (!isQuickReply) {
-            setQuery('');
+    const handleSend = async (userText) => {
+        if (!userText.trim()) return;
+
+        // Add user message
+        const userMessage = { type: 'user', text: userText };
+        setConversationHistory(prev => [...prev, userMessage]);
+        setQuery('');
+        setIsLoading(true);
+
+        try {
+            // Call OpenAI
+            const response = await chatWithAssistant(userText, conversationHistory);
+
+            if (response.success) {
+                const botMessage = { type: 'bot', text: response.message };
+                setConversationHistory(prev => [...prev, botMessage]);
+            } else {
+                const errorMessage = {
+                    type: 'bot',
+                    text: `❌ ${response.error || 'Hubo un error al procesar tu consulta. Por favor, intenta de nuevo.'}`,
+                    isError: true
+                };
+                setConversationHistory(prev => [...prev, errorMessage]);
+            }
+        } catch (error) {
+            console.error('Error in handleSend:', error);
+            const errorMessage = {
+                type: 'bot',
+                text: '❌ Error de conexión. Por favor, verifica tu clave de API y tu conexión a internet.',
+                isError: true
+            };
+            setConversationHistory(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleBotLinkClick = (e, href) => {
         e.preventDefault();
-        if (href.includes('#/biblioteca')) {
+        if (href.includes('#/biblioteca') || href.includes('biblioteca')) {
             setIsOpen(false);
             setActiveTab('Biblioteca');
         }
@@ -260,9 +295,19 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        if (query.trim()) {
-            handleSend(query, false);
+        if (query.trim() && !isLoading) {
+            handleSend(query);
         }
+    };
+
+    const handleResetConfig = () => {
+        localStorage.removeItem('gosteam_openai_key');
+        setApiKey('');
+        setIsConfigured(false);
+        setShowConfig(false);
+        setConversationHistory([
+            { type: 'bot', text: 'Configuración eliminada. Por favor, introduce tu clave de API de OpenAI para comenzar.' }
+        ]);
     };
 
     return (
@@ -274,15 +319,92 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
                 <div className="flex items-center space-x-2">
                     <Sparkles className="w-5 h-5 text-gosteam-purple" />
                     <h3 className="text-lg font-bold text-gray-800 font-display">Asistente GoSteam</h3>
+                    {isConfigured && (
+                        <CheckCircle className="w-4 h-4 text-green-500" title="OpenAI conectado" />
+                    )}
                 </div>
-                <button
-                    onClick={() => setIsOpen(false)}
-                    className="p-1 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
-                    aria-label="Cerrar Asistente"
-                >
-                    <X className="w-6 h-6" />
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setShowConfig(!showConfig)}
+                        className="p-1 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
+                        aria-label="Configuración"
+                        title="Configurar API"
+                    >
+                        <Settings className="w-5 h-5" />
+                    </button>
+                    <button
+                        onClick={() => setIsOpen(false)}
+                        className="p-1 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
+                        aria-label="Cerrar Asistente"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
             </div>
+
+            {/* Configuration Panel */}
+            {showConfig && (
+                <div className="p-4 bg-amber-50 border-b border-amber-200">
+                    <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        Configuración de API
+                    </h4>
+                    <div className="space-y-2">
+                        <input
+                            type="password"
+                            placeholder="sk-..."
+                            className="w-full p-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gosteam-purple"
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.target.value)}
+                        />
+                        {configError && (
+                            <p className="text-xs text-red-600">{configError}</p>
+                        )}
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleConfigureAPI}
+                                className="flex-1 py-2 px-3 bg-gosteam-purple text-white text-sm rounded-lg hover:bg-gosteam-purple-dark transition"
+                            >
+                                Guardar
+                            </button>
+                            {isConfigured && (
+                                <button
+                                    onClick={handleResetConfig}
+                                    className="py-2 px-3 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition"
+                                >
+                                    Eliminar
+                                </button>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-600">
+                            Tu clave se guarda localmente en tu navegador y nunca se envía a nuestros servidores.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* API Key Warning */}
+            {!isConfigured && !showConfig && (
+                <div className="p-4 bg-yellow-50 border-b border-yellow-200">
+                    <div className="flex items-start gap-2">
+                        <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="text-sm text-yellow-800 font-medium">
+                                Configuración requerida
+                            </p>
+                            <p className="text-xs text-yellow-700 mt-1">
+                                Necesitas configurar tu clave de API de OpenAI para usar el asistente.
+                            </p>
+                            <button
+                                onClick={() => setShowConfig(true)}
+                                className="mt-2 text-xs text-yellow-800 underline hover:text-yellow-900"
+                            >
+                                Configurar ahora
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Historial de Conversación */}
             <div className="flex-grow p-4 space-y-4 overflow-y-auto assistant-scrollbar">
@@ -290,10 +412,13 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
                     <div key={index} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[85%] p-3 rounded-lg shadow-sm whitespace-pre-line ${msg.type === 'user'
                             ? 'bg-gosteam-purple text-white rounded-br-none'
+                            : msg.isError
+                            ? 'bg-red-50 text-red-800 rounded-tl-none border border-red-200'
                             : 'bg-gray-100 text-gray-800 rounded-tl-none'}`}
                         >
-                            {msg.type === 'bot' && <span className="font-semibold block mb-1">GoSteam:</span>}
+                            {msg.type === 'bot' && !msg.isError && <span className="font-semibold block mb-1">GoSteam:</span>}
 
+                            {/* Parse markdown-style links */}
                             {msg.text.split(/(\[.*?\]\([^)]*\))/g).map((part, pIndex) => {
                                 if (part.startsWith('[')) {
                                     const match = part.match(/\[(.*?)\]\(([^)]*)\)/);
@@ -310,25 +435,30 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
                                         </a>;
                                     }
                                 }
-                                return part;
+                                return <span key={pIndex}>{part}</span>;
                             })}
-
-                            {msg.replies && (
-                                <div className="flex flex-wrap gap-2 mt-3">
-                                    {msg.replies.map((reply, replyIndex) => (
-                                        <button
-                                            key={replyIndex}
-                                            onClick={() => handleSend(reply.payload, true)}
-                                            className="text-xs px-3 py-1 bg-white border border-gray-300 text-gray-700 rounded-full hover:bg-purple-50 transition shadow-sm"
-                                        >
-                                            {reply.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
                         </div>
                     </div>
                 ))}
+
+                {/* Loading indicator */}
+                {isLoading && (
+                    <div className="flex justify-start">
+                        <div className="max-w-[85%] p-3 rounded-lg shadow-sm bg-gray-100 text-gray-800 rounded-tl-none">
+                            <span className="font-semibold block mb-1">GoSteam:</span>
+                            <div className="flex items-center gap-2">
+                                <div className="flex gap-1">
+                                    <div className="w-2 h-2 bg-gosteam-purple rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                    <div className="w-2 h-2 bg-gosteam-purple rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                    <div className="w-2 h-2 bg-gosteam-purple rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                                </div>
+                                <span className="text-sm text-gray-600">Pensando...</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div ref={chatEndRef} />
             </div>
 
             {/* Barra de Entrada */}
@@ -336,23 +466,18 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
                 <form onSubmit={handleFormSubmit} className="flex items-center bg-white border border-gray-300 rounded-xl p-1 shadow-inner">
                     <input
                         type="text"
-                        placeholder="Escribe tu consulta o pide ayuda..."
-                        className="flex-grow p-2 text-sm border-none focus:outline-none bg-transparent"
+                        placeholder={isConfigured ? "Escribe tu consulta o pide ayuda..." : "Configura la API primero..."}
+                        className="flex-grow p-2 text-sm border-none focus:outline-none bg-transparent disabled:text-gray-400"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
+                        disabled={!isConfigured || isLoading}
                     />
 
                     <div className="flex items-center space-x-1 pr-1">
-                        <button type="button" className="text-gray-500 hover:text-gosteam-purple p-1 rounded-full transition" title="Entrada de Voz">
-                            <Mic className="w-5 h-5" />
-                        </button>
-                        <button type="button" className="text-gray-500 hover:text-gosteam-purple p-1 rounded-full transition" title="Subir archivo">
-                            <Upload className="w-5 h-5" />
-                        </button>
                         <button
                             type="submit"
-                            disabled={!query.trim()}
-                            className={`p-2 rounded-lg transition ${query.trim() ? 'bg-gosteam-purple text-white hover:bg-gosteam-purple-dark' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                            disabled={!query.trim() || !isConfigured || isLoading}
+                            className={`p-2 rounded-lg transition ${query.trim() && isConfigured && !isLoading ? 'bg-gosteam-purple text-white hover:bg-gosteam-purple-dark' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
                             aria-label="Enviar consulta"
                         >
                             <Send className="w-4 h-4" />
