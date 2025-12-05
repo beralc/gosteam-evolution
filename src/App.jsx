@@ -274,24 +274,35 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
 
         try {
             // Call OpenAI
+            console.log('Calling OpenAI with message:', userText);
             const response = await chatWithAssistant(userText, conversationHistory);
+            console.log('OpenAI response:', response);
 
-            if (response.success) {
+            if (response && response.success) {
                 const botMessage = { type: 'bot', text: response.message };
                 setConversationHistory(prev => [...prev, botMessage]);
-            } else {
+            } else if (response && response.error) {
                 const errorMessage = {
                     type: 'bot',
-                    text: `❌ ${response.error || 'Hubo un error al procesar tu consulta. Por favor, intenta de nuevo.'}`,
+                    text: `❌ ${response.error}`,
                     isError: true
                 };
                 setConversationHistory(prev => [...prev, errorMessage]);
+            } else {
+                // Fallback error
+                const errorMessage = {
+                    type: 'bot',
+                    text: '❌ Hubo un error inesperado. Por favor, intenta de nuevo.',
+                    isError: true
+                };
+                setConversationHistory(prev => [...prev, errorMessage]);
+                console.error('Unexpected response format:', response);
             }
         } catch (error) {
             console.error('Error in handleSend:', error);
             const errorMessage = {
                 type: 'bot',
-                text: '❌ Error de conexión. Por favor, verifica tu clave de API y tu conexión a internet.',
+                text: `❌ Error de conexión: ${error.message}. Por favor, verifica tu clave de API y tu conexión a internet.`,
                 isError: true
             };
             setConversationHistory(prev => [...prev, errorMessage]);
@@ -340,6 +351,12 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
         ]);
     };
 
+    const handleClearChat = () => {
+        setConversationHistory([
+            { type: 'bot', text: '¡Hola! Soy tu Asistente GoSteam. Puedo ayudarte a encontrar recursos, planificar clases o responder dudas sobre la plataforma. ¿Qué necesitas hoy?' }
+        ]);
+    };
+
     return (
         <div
             className={`fixed top-0 right-0 h-full w-full lg:w-96 bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
@@ -354,6 +371,16 @@ const AssistantChatbot = ({ isOpen, setIsOpen, setActiveTab }) => {
                     )}
                 </div>
                 <div className="flex items-center gap-2">
+                    {conversationHistory.length > 1 && (
+                        <button
+                            onClick={handleClearChat}
+                            className="p-1 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
+                            aria-label="Limpiar chat"
+                            title="Limpiar conversación"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    )}
                     <button
                         onClick={() => setShowConfig(!showConfig)}
                         className="p-1 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
