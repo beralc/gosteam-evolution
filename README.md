@@ -2,6 +2,12 @@
 
 Mockup de la plataforma educativa GoSteam de Edelvives para gestión de proyectos STEAM.
 
+## 🌐 Demo en Vivo
+
+**URL:** https://horizontetalento.vercel.app
+
+⚠️ **Nota:** El asistente IA requiere configurar la variable de entorno `VITE_OPENAI_API_KEY` en Vercel.
+
 ## 🚀 Instalación y Ejecución
 
 ### Requisitos Previos
