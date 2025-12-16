@@ -2906,13 +2906,8 @@ export const App = () => {
                             <Home className="w-6 h-6" />
                         </button>
                     )}
-                    {/* ✨ CAMBIO: Logo a color en el header */}
-                    <img
-                        src={goSteamLogoUrl}
-                        alt="GoSteam Evolution Logo"
-                        className="h-8 md:h-10"
-                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/150x40/793D9B/ffffff?text=GoSteam"; }}
-                    />
+                    {/* Logo TALENT */}
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-800 font-display">TALENT</h1>
 
                     <h1 className="ml-6 text-xl font-semibold text-gray-700 hidden sm:block font-display">/ {activeTab}</h1>
                 </div>
@@ -2953,14 +2948,9 @@ export const App = () => {
 
                 <div className="relative p-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left max-w-7xl mx-auto">
 
-                    {/* ✨ CAMBIO: Logo blanco en el footer */}
+                    {/* Logo TALENT en footer */}
                     <div className="flex flex-col items-center md:items-start mb-6 md:mb-0">
-                        <img
-                            src={goSteamWhiteLogoUrl}
-                            alt="GoSteam Evolution - by EDELVIVES"
-                            className="h-8 mb-2"
-                            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/150x40/ffffff/793D9B?text=GoSteam"; }}
-                        />
+                        <h2 className="text-2xl font-bold text-white font-display mb-2">TALENT</h2>
                         <p className="text-xs font-semibold text-gray-300">by EDELVIVES</p>
                     </div>
 
