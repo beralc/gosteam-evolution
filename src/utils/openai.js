@@ -54,7 +54,9 @@ const isRelatedToGoSteam = (userMessage) => {
   // Platform-related keywords
   const platformKeywords = [
     'gosteam', 'biblioteca', 'proyecto', 'filtro', 'buscar', 'navega',
-    'clase', 'recurso', 'dashboard', 'sesion', 'docente', 'profesor'
+    'clase', 'recurso', 'dashboard', 'sesion', 'docente', 'profesor',
+    'libro', 'lectura', 'leer', 'habilidades lectoras', 'epub', 'cuento',
+    'novela', 'autor', 'editorial', 'portada', 'página', 'capítulo'
   ];
 
   // STEAM-related keywords
@@ -221,20 +223,38 @@ ${FAQ.categories.slice(0, 1)[0].questions.map(q =>
 /**
  * Create system prompt based on question type
  */
-const createSystemPrompt = (questionType) => {
+const createSystemPrompt = (questionType, booksData = null) => {
+  let booksContext = '';
+  if (booksData && booksData.length > 0) {
+    booksContext = `\n\nBIBLIOTECA DE HABILIDADES LECTORAS:
+La plataforma tiene una sección de "Habilidades Lectoras" con ${booksData.length} libros disponibles:
+
+${booksData.map(libro => `- "${libro.titulo}" de ${libro.autor} (${libro.editorial})
+  * Edad recomendada: ${libro.edadRecomendada}
+  * Idioma: ${libro.idioma}
+  * Género: ${libro.genero}
+  * Temática: ${libro.tematica}
+  * Valores: ${libro.valores.join(', ')}
+  * Páginas: ${libro.paginas}
+  * Descripción: ${libro.descripcion}`).join('\n\n')}
+
+Para acceder a los libros, usa el enlace: [Ver Habilidades Lectoras](habilidades-lectoras)
+`;
+  }
+
   const basePrompt = `Eres el Asistente GoSteam, un asistente educativo amigable y profesional de la plataforma GoSteam Evolution de Edelvives.
 
-Tu objetivo es ayudar a profesores y alumnos de primaria a usar la plataforma y gestionar proyectos STEAM.
+Tu objetivo es ayudar a profesores y alumnos de primaria a usar la plataforma, gestionar proyectos STEAM y descubrir libros de lectura.
 
 ⚠️ RESTRICCIÓN IMPORTANTE - SOLO TEMAS DE LA PLATAFORMA:
-- SOLO puedes responder preguntas sobre la plataforma GoSteam, sus proyectos STEAM, y cómo usarla
+- SOLO puedes responder preguntas sobre la plataforma GoSteam, sus proyectos STEAM, los libros de Habilidades Lectoras, y cómo usarla
 - Si te preguntan algo que NO está relacionado con GoSteam o educación STEAM, debes decir amablemente:
-  "Lo siento, solo puedo ayudarte con preguntas sobre la plataforma GoSteam y sus proyectos STEAM. ¿Hay algo sobre los proyectos o la plataforma en lo que pueda ayudarte?"
+  "Lo siento, solo puedo ayudarte con preguntas sobre la plataforma GoSteam, sus proyectos STEAM y los libros de lectura. ¿Hay algo sobre los proyectos, libros o la plataforma en lo que pueda ayudarte?"
 - NO respondas preguntas sobre: temas generales, actualidad, matemáticas generales, tareas escolares no relacionadas, etc.
 - MANTÉN un tono apropiado para alumnos de primaria (6-12 años): amigable, claro, motivador
 
 CONTEXTO DE LA PLATAFORMA:
-${buildContextString()}
+${buildContextString()}${booksContext}
 
 IMPORTANTE - COMPORTAMIENTO ADAPTATIVO:
 `;
@@ -283,16 +303,17 @@ Incluye:
 5. **Consejos prácticos** para optimizar el uso
 
 **IMPORTANTE - Usa enlaces markdown para la navegación:**
-- Para ir a la Biblioteca: [Ver Biblioteca](biblioteca)
+- Para ir a Proyectos TALENT: [Ver Proyectos TALENT](biblioteca)
+- Para ir a Habilidades Lectoras: [Ver Habilidades Lectoras](habilidades-lectoras)
 - Para ir a Mis Clases: [Ir a Mis Clases](mis-clases)
 - Para ir al Dashboard: [Volver al Dashboard](dashboard)
 - Para ir a Recursos: [Ver Recursos](recursos)
 - Para ir a En tu Casa: [Ver En tu Casa](en-tu-casa)
 
 Ejemplos de respuestas apropiadas:
-- "Para filtrar proyectos por etapa educativa, ve a la [Biblioteca](biblioteca). En el panel izquierdo verás 'Filtros', donde puedes seleccionar Primaria, Secundaria, etc."
-- "Puedes explorar todos los proyectos en la [Biblioteca](biblioteca) o crear una nueva clase desde [Mis Clases](mis-clases)."
-- "La barra de búsqueda está en la columna izquierda de la [Biblioteca](biblioteca). Escribe el nombre del proyecto y los resultados se filtrarán automáticamente."
+- "Para filtrar proyectos por etapa educativa, ve a [Proyectos TALENT](biblioteca). En el panel izquierdo verás 'Filtros', donde puedes seleccionar Primaria, Secundaria, etc."
+- "Puedes explorar todos los proyectos en [Proyectos TALENT](biblioteca) o crear una nueva clase desde [Mis Clases](mis-clases)."
+- "Para ver los libros disponibles, ve a [Habilidades Lectoras](habilidades-lectoras) donde encontrarás toda la biblioteca de lectura."
 
 Sé **específico, útil y directo**. **SIEMPRE incluye enlaces** cuando menciones una sección de la plataforma.
 `;
@@ -318,9 +339,10 @@ Responde amablemente: "Lo siento, solo puedo ayudarte con preguntas sobre la pla
 5. **Incluir enlaces** para que puedan explorar fácilmente
 
 **IMPORTANTE - Usa enlaces markdown:**
-- Para sugerir explorar proyectos: "Puedes ver todos los proyectos en la [Biblioteca](biblioteca)"
+- Para sugerir explorar proyectos: "Puedes ver todos los proyectos en [Proyectos TALENT](biblioteca)"
+- Para recomendar libros: "Explora nuestra colección de libros en [Habilidades Lectoras](habilidades-lectoras)"
 - Para recomendar una sección: "Explora la sección de [Recursos](recursos)"
-- Cuando menciones una categoría: "Tenemos muchos proyectos de robótica en la [Biblioteca](biblioteca)"
+- Cuando menciones una categoría: "Tenemos muchos proyectos de robótica en [Proyectos TALENT](biblioteca)"
 
 Mantén un tono **amigable, claro y apropiado para primaria** (6-12 años).
 
@@ -332,7 +354,7 @@ Si no estás seguro de algo sobre la plataforma, sé honesto y sugiere explorar 
 /**
  * Chat with OpenAI Assistant
  */
-export const chatWithAssistant = async (userMessage, conversationHistory = []) => {
+export const chatWithAssistant = async (userMessage, conversationHistory = [], booksData = null) => {
   if (!openaiClient) {
     throw new Error('OpenAI client not initialized. Call initializeOpenAI() first.');
   }
@@ -355,7 +377,7 @@ export const chatWithAssistant = async (userMessage, conversationHistory = []) =
     const messages = [
       {
         role: 'system',
-        content: createSystemPrompt(questionType)
+        content: createSystemPrompt(questionType, booksData)
       }
     ];
 
